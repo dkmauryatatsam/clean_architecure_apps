@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:daily_task/features/dailyTask/data/datasources/local_data_source.dart';
 import 'package:daily_task/features/dailyTask/data/models/task_model.dart';
 import 'package:daily_task/features/dailyTask/domain/entities/task_entity.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
@@ -19,6 +21,7 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   Future<Database> get _db async => _dbOpenCompleter!.future;
   final _taskStore = intMapStoreFactory.store(MAP_STORE);
+  final db = GetStorage();
 
   Future _initDatabase() async {
     final appDocumentDir = await getApplicationDocumentsDirectory();
@@ -49,13 +52,10 @@ class LocalDataSourceImpl implements LocalDataSource {
   @override
   Future<List<TaskEntity>> getAllTask() async {
     final finder = Finder(sortOrders: [SortOrder('id')]);
-    final recordSnapshot = await _taskStore.find(await _db, finder: finder);
-
-    return recordSnapshot.map((task) {
-      final taskData = TaskModel.fromJson(task.value);
-      taskData.id = task.key;
-      return taskData;
-    }).toList();
+    final recordSnapshot = await _taskStore.find(await _db);
+    final data =
+        recordSnapshot.map((task) => TaskModel.fromJson(task.value)).toList();
+    return data;
   }
 
   @override

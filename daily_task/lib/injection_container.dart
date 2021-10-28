@@ -12,7 +12,7 @@ import 'package:daily_task/features/dailyTask/domain/usecases/update_task.dart';
 import 'package:daily_task/features/dailyTask/presentation/controller/task_controller.dart';
 import 'package:get_it/get_it.dart';
 
-GetIt sl = GetIt.instance();
+GetIt sl = GetIt.instance;
 Future<void> init() async {
   //controller
   sl.registerFactory<TaskController>(

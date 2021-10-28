@@ -64,7 +64,7 @@ class TaskController extends GetxController {
       final taskData = await getTask();
       _task.value = taskData;
     } catch (e) {
-      log(e.toString());
+      log("data not found");
     }
   }
 
@@ -90,5 +90,11 @@ class TaskController extends GetxController {
     } catch (e) {
       log(e.toString());
     }
+  }
+
+  @override
+  Future<void> onInit() async {
+    await getAllTask();
+    super.onInit();
   }
 }
