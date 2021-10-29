@@ -11,6 +11,7 @@ import 'package:daily_task/features/dailyTask/domain/usecases/turn_on_notificati
 import 'package:daily_task/features/dailyTask/domain/usecases/update_task.dart';
 import 'package:daily_task/features/dailyTask/presentation/controller/task_controller.dart';
 import 'package:get_it/get_it.dart';
+import 'package:get_storage/get_storage.dart';
 
 GetIt sl = GetIt.instance;
 Future<void> init() async {
@@ -44,5 +45,6 @@ Future<void> init() async {
       () => LocalRepositoryImpl(localDataSource: sl.call()));
 
   // remote data source
-  sl.registerLazySingleton<LocalDataSource>(() => LocalDataSourceImpl());
+  final coreBox = GetStorage();
+  sl.registerLazySingleton<LocalDataSource>(() => LocalDataSourceImpl(coreBox));
 }
