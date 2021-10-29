@@ -1,7 +1,5 @@
 import 'dart:developer';
 
-import 'package:get/get.dart';
-
 import 'package:daily_task/features/dailyTask/domain/entities/task_entity.dart';
 import 'package:daily_task/features/dailyTask/domain/usecases/add_task.dart';
 import 'package:daily_task/features/dailyTask/domain/usecases/delete_task.dart';
@@ -10,6 +8,7 @@ import 'package:daily_task/features/dailyTask/domain/usecases/get_task.dart';
 import 'package:daily_task/features/dailyTask/domain/usecases/open_database.dart';
 import 'package:daily_task/features/dailyTask/domain/usecases/turn_on_notification.dart';
 import 'package:daily_task/features/dailyTask/domain/usecases/update_task.dart';
+import 'package:get/get.dart';
 
 enum PageState { initial, loading, loaded, failure }
 
@@ -38,6 +37,7 @@ class TaskController extends GetxController {
   Future<void> addNewTask({required TaskEntity task}) async {
     try {
       await addTask(task);
+      await getAllTask();
     } catch (e) {
       log(e.toString());
     }

@@ -1,34 +1,24 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:daily_task/features/dailyTask/data/datasources/local_data_source.dart';
 import 'package:daily_task/features/dailyTask/data/models/task_model.dart';
 import 'package:daily_task/features/dailyTask/domain/entities/task_entity.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
-import 'package:sembast/sembast_io.dart';
 
 const String MAP_STORE = "MAP_STORE_TASK";
+const String TASKBOX = "TASKS";
 
 class LocalDataSourceImpl implements LocalDataSource {
-  Completer<Database>? _dbOpenCompleter;
+  final GetStorage box;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<Database> get _db async => _dbOpenCompleter!.future;
+  LocalDataSourceImpl(this.box);
+
   final _taskStore = intMapStoreFactory.store(MAP_STORE);
   final db = GetStorage();
-
-  Future _initDatabase() async {
-    final appDocumentDir = await getApplicationDocumentsDirectory();
-    final dbPath = join(appDocumentDir.path, 'task.db');
-    final database = await databaseFactoryIo.openDatabase(dbPath);
-    _dbOpenCompleter!.complete(database);
-  }
 
   @override
   Future<void> addNewTask(TaskEntity task) async {
@@ -40,22 +30,30 @@ class LocalDataSourceImpl implements LocalDataSource {
       isNotification: task.isNotification,
       taskType: task.taskType,
     ).toJson();
-    _taskStore.add(await _db, newTask);
+    await box.write(TASKBOX, newTask);
   }
 
   @override
   Future<void> deleteTask(TaskEntity task) async {
-    final finder = Finder(filter: Filter.byKey(task.id));
-    _taskStore.delete(await _db, finder: finder);
+    throw UnimplementedError();
   }
 
   @override
   Future<List<TaskEntity>> getAllTask() async {
-    final finder = Finder(sortOrders: [SortOrder('id')]);
-    final recordSnapshot = await _taskStore.find(await _db);
-    final data =
-        recordSnapshot.map((task) => TaskModel.fromJson(task.value)).toList();
-    return data;
+    final List<TaskEntity> tasks = [];
+    final result = await box.read(TASKBOX) as Map<String, dynamic>;
+    final task = TaskModel.fromJson(result);
+    tasks.add(
+      TaskEntity(
+        title: task.title,
+        colorIndex: task.colorIndex,
+        time: task.time,
+        taskType: task.taskType,
+        isComplete: task.isComplete,
+        isNotification: task.isNotification,
+      ),
+    );
+    return tasks;
   }
 
   @override
@@ -81,38 +79,36 @@ class LocalDataSourceImpl implements LocalDataSource {
 
   @override
   Future<Database> openDatabase() async {
-    if (_dbOpenCompleter == null) {
-      _dbOpenCompleter = Completer();
-      _initDatabase();
-    }
-    return _dbOpenCompleter!.future;
+    throw UnimplementedError();
   }
 
   @override
   Future<void> turnOnNotification(TaskEntity task) async {
-    final updatedTask = TaskModel(
-      title: task.title,
-      colorIndex: task.colorIndex,
-      time: task.time,
-      isComplete: task.isComplete,
-      isNotification: task.isNotification == true ? false : true,
-      taskType: task.taskType,
-    ).toJson();
-    final finder = Finder(filter: Filter.byKey(task.id));
-    _taskStore.update(await _db, updatedTask, finder: finder);
+    // final updatedTask = TaskModel(
+    //   title: task.title,
+    //   colorIndex: task.colorIndex,
+    //   time: task.time,
+    //   isComplete: task.isComplete,
+    //   isNotification: task.isNotification == true ? false : true,
+    //   taskType: task.taskType,
+    // ).toJson();
+    // final finder = Finder(filter: Filter.byKey(task.id));
+    // _taskStore.update(await _db, updatedTask, finder: finder);
+    throw UnimplementedError();
   }
 
   @override
   Future<void> updateTask(TaskEntity task) async {
-    final updatedTask = TaskModel(
-      title: task.title,
-      colorIndex: task.colorIndex,
-      time: task.time,
-      isComplete: task.isComplete == true ? false : true,
-      isNotification: task.isNotification,
-      taskType: task.taskType,
-    ).toJson();
-    final finder = Finder(filter: Filter.byKey(task.id));
-    _taskStore.update(await _db, updatedTask, finder: finder);
+    // final updatedTask = TaskModel(
+    //   title: task.title,
+    //   colorIndex: task.colorIndex,
+    //   time: task.time,
+    //   isComplete: task.isComplete == true ? false : true,
+    //   isNotification: task.isNotification,
+    //   taskType: task.taskType,
+    // ).toJson();
+    // final finder = Finder(filter: Filter.byKey(task.id));
+    // _taskStore.update(await _db, updatedTask, finder: finder);
+    throw UnimplementedError();
   }
 }
